@@ -65,7 +65,7 @@ var update = function(){
 
   enemies.transition()
                     .duration(1500)
-                    .tween('checker', tweener)
+                    .tween('checker', checkCollision)
                     .attr('cx', function(d){return d.x})
                     .attr('cy', function(d){return d.y});
 
@@ -82,9 +82,7 @@ var update = function(){
 
   };
 var checkCollision = function(enemy) {
-  // var enemies = d3.select('.gameBoard').selectAll('.enemies');
-  // for (var i = 0; i < enemies.length; i++) {
-    // console.log(separation);
+    var enemy=d3.select(this);
       return function(t){
     var radiusSum = parseFloat(enemy.attr('r')) + parseFloat(player.attr('r'));
 
@@ -93,15 +91,12 @@ var checkCollision = function(enemy) {
     var separation = Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
 
     if (separation < radiusSum) {
-        gameStats.collisions++;
+
+      gameStats.collisions++;
         return resetScore();
       }
     };
 
-};
-var tweener = function(){
-  var enemy = d3.select(this);
-  return checkCollision(enemy)
 };
 var resetScore = function(){
   if (gameStats.score > gameStats.bestScore) {

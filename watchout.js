@@ -23,9 +23,8 @@ var gameBoard = d3.select('.gameBoard').attr('width', gameOptions.width)
                                        .attr('height', gameOptions.height);
 
 var createEnemies = function(){
-  var enemies = _.range(0,gameOptions.nEnemies).map(function(index){
+  var enemies = d3.range(0,gameOptions.nEnemies).map(function(index){
     return {
-      id: index,
       x: axes.x(Math.random()*100),
       y: axes.y(Math.random()*100)
     };
@@ -33,25 +32,43 @@ var createEnemies = function(){
   return enemies;
 };
 
-var render = function(){
-  var enemies = d3.select('.gameBoard').selectAll('.enemies').data(createEnemies()).enter().append('circle').attr('cx', function(d){return d.x}).attr('cy', function(d){return d.y}).attr('r', 10).attr('id', function(d){return d.id}).style('fill', 'white').style('stroke', 'blue').style('stroke-width', 2).attr('class', 'enemies');
+var drag = d3.behavior.drag()
+                      .on('drag',function () {
+                                 d3.select(this)
+                                 .attr('cx', d3.event.x)
+                                 .attr('cy', d3.event.y);
+}
+);
+
+var player = d3.select('.gameBoard').selectAll('.player').data([{x: axes.x(50), y: axes.y(50)}]).enter()
+                  .append('circle')
+                  .attr('cx', function(d){return d.x})
+                  .attr('cy', function(d){return d.y})
+                  .attr('r', 10)
+                  .style('fill', 'red')
+                  .style('stroke', 'blue')
+                  .style('stroke-width', 2)
+                  .attr('class', 'player')
+                  .call(drag);
+
+var update = function(){
+  var enemies = d3.select('.gameBoard').selectAll('.enemies')
+               .data(createEnemies());
+
+  enemies.transition().duration(1500)
+                    .attr('cx', function(d){return d.x})
+                    .attr('cy', function(d){return d.y});
 
 
-
+  enemies.enter()
+         .append('circle')
+         .attr('cx', function(d){return d.x})
+         .attr('cy', function(d){return d.y})
+         .attr('r', 10)
+         .style('fill', 'white')
+         .style('stroke', 'blue')
+         .style('stroke-width', 2)
+         .attr('class', 'enemies');
 };
-render();
-// var circles= svgContainer.selectAll('circle')
-//                          .data(randomize(30))
-//                          .enter()
-//                          .append('circle')
-//                          .attr('cx', function (d) { return d.x; })
-//                          .attr('cy', function (d) { return d.y; })
-//                          .attr('r', 10)
-//                          .attr('fill','white')
-//                          .attr('stroke', 'blue')
-//                          .attr('stroke-width', 2);
-
-// var update = function(){
-//   //move all the circles to new coordinates given by randomize function
-
-// };
+update();
+setInterval(update, 1700);
